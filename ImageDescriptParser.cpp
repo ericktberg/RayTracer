@@ -5,7 +5,7 @@
 
 using namespace std;
 
-ImageDescriptParser::ImageDescriptParser(string inputFileName) : Parser(inputFileName)
+ImageDescriptParser::ImageDescriptParser() : Parser()
 {
 }
 
@@ -14,7 +14,7 @@ ImageDescriptParser::~ImageDescriptParser()
 {
 }
 
-int ImageDescriptParser::parse(ImageFile* target){
+int ImageDescriptParser::parse(ImageFile* target, string sourceText){
 	string line = "";
 	ifstream inputStream(sourceText);
 	if (inputStream.is_open()){

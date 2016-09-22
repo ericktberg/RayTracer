@@ -8,25 +8,20 @@
 
 using namespace std;
 
-Parser::Parser(string source)
+Parser::Parser()
 {
-	sourceText = source;
 }
 
 Parser::~Parser()
 {
 }
 
-string Parser::getFileStripped(){
+string Parser::getFileStripped(string sourceText){
 	istringstream ss(sourceText);
 	string file = "";
 	getline(ss, file, '.');
 	cout << file;
 	return file;
-}
-
-void Parser::setSource(string newSource){
-	sourceText = newSource;
 }
 
 int Parser::parseFile(){

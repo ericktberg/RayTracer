@@ -13,10 +13,10 @@
 class ImageDescriptParser : public Parser
 {
 	public:
-		ImageDescriptParser(std::string inputFileName);
+		ImageDescriptParser();
 		~ImageDescriptParser();
 
-		int parse(ImageFile* target);
+		int parse(ImageFile* target, std::string sourceText);
 
 	protected:
 		

@@ -13,16 +13,13 @@
 class Parser
 {
 	public:
-		Parser(std::string sourceText);
+		Parser();
 		~Parser();
 
 		int parseFile();
 
-		void setSource(std::string newSource);
-
 		// If source text is a file name, return the name, stripped of extension.
-		std::string getFileStripped();
+		std::string getFileStripped(std::string sourceText);
 	protected:
-		std::string sourceText;
 };
 
