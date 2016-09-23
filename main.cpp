@@ -10,6 +10,7 @@
 #include "RGBColor.h"
 #include "RGBImageGenerator.h"
 #include "Scene.h"
+#include "SceneParser.h"
 #include "Vector3D.h"
 
 
@@ -45,23 +46,16 @@ void Assignment1(){
 }
 
 int main(){
-	Camera mainCam({ 0, 0, 0 }, { 0, .5, 1 }, { 0, 0, 1 }, 1, 90);
-	cout << "u: " << mainCam.getBasis().u.x << " " << mainCam.getBasis().u.y << " " << mainCam.getBasis().u.z << "\n";
-	cout << "v: " << mainCam.getBasis().v.x << " " << mainCam.getBasis().v.y << " " << mainCam.getBasis().v.z << "\n";
-	cout << "w: " << mainCam.getBasis().w.x << " " << mainCam.getBasis().w.y << " " << mainCam.getBasis().w.z << "\n\n";
-
-	Plane viewPlane = mainCam.getViewPlane();
-	cout << "ul: " << viewPlane.ul.x << " " << viewPlane.ul.y << " " << viewPlane.ul.z << "\n";
-	cout << "ur: " << viewPlane.ur.x << " " << viewPlane.ur.y << " " << viewPlane.ur.z << "\n";
-	cout << "ll: " << viewPlane.ll.x << " " << viewPlane.ll.y << " " << viewPlane.ll.z << "\n";
-	cout << "lr: " << viewPlane.lr.x << " " << viewPlane.lr.y << " " << viewPlane.lr.z << "\n\n";
+	RenderEngine renderer;
+	SceneParser parser;
+	Scene myScene;
+	Camera mainCam;
+	parser.parseSceneFile(&renderer, &myScene, &mainCam, "assign1a.txt");
+	//Camera mainCam({ 0, 0, 0 }, { 0, .5, 1 }, { 0, 0, 1 }, 1, 90);
 
 	//TODO: incorporate only 1 description of height/width in render constructor.
-	PPMFile ppm("rendered", 150, 150, 255);
+	PPMFile ppm("rendered", renderer.getWidth(), renderer.getHeight(), 255);
 
-
-	Scene myScene({ 0, 0, 0 });
-	RenderEngine renderer(150, 150);
 	ppm.writeToFile(renderer.render(mainCam, myScene));
 	return 0;
 }

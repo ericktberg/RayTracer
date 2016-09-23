@@ -15,7 +15,9 @@ class RGBImageGenerator
 		RGBImageGenerator(int width, int height, int maxVal);
 		~RGBImageGenerator();
 
+		// Generate a pixel array of one solid color
 		RGBColor* generateSolid(RGBColor rgb);
+		// Generate a pixel array consisting of a vertical gradient.
 		RGBColor* generateGradient(RGBColor topColor, RGBColor bottomColor);
 
 	private:

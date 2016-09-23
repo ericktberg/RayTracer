@@ -1,6 +1,5 @@
 #pragma once
 #include "Object.h"
-#include <iostream>
 
 using namespace std;
 Object::Object(double x, double y, double z, int r, int g, int b) : location(x, y, z), orientation()
@@ -23,7 +22,7 @@ Object::Object(Point3D xyz, RGBColor rgb) : orientation({ 1, 0, 0 }, { 0, 0, 1 }
 	objectColor = rgb;
 }
 
-// Overloaded constructors?
+// TODO: do I need these Overloaded constructors?
 
 Object::~Object()
 {
@@ -45,15 +44,11 @@ void Object::setLocation(double x, double y, double z){
 	location = { x, y, z };
 }
 
-void Object::setObjectColor(int r, int g, int b){
+void Object::setObjectColor(double r, double g, double b){
 	objectColor = { r, g, b };
 }
 
-void Object::testObject(){
-	cout << "I am an Object\n";
-}
-
+//TODO: add default ray collision behavior for polygonal objects
 double Object::rayCollision(Ray3D ray, double nearDist, RGBColor* color){
-	cout << "I am an Object\n";
 	return 1;
 }

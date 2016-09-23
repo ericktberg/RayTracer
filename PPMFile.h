@@ -24,6 +24,8 @@ class PPMFile : public ImageFile
 		int getMaxVal();
 
 		// Writes a width*height dimension array to the destination file
+
+		//TODO: gets width and height from params.
 		void writeToFile(RGBColor* image);
 
 	private:

@@ -49,7 +49,7 @@ string PPMFile::ppmHeader(){
 string PPMFile::convertImage(RGBColor* image){
 	stringstream outputImage;
 	for (int i = 0; i < width*height; i++){
-		outputImage << image[i].r << " " << image[i].g << " " << image[i].b << "\n";
+		outputImage << image[i].rConvert(maxVal) << " " << image[i].gConvert(maxVal) << " " << image[i].bConvert(maxVal) << "\n";
 	}
 	return outputImage.str();
 }

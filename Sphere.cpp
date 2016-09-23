@@ -1,6 +1,7 @@
 #include "Sphere.h"
 #include "Ray3D.h"
 #include "Vector3D.h"
+
 #include <math.h>
 #include <algorithm>
 
@@ -16,11 +17,6 @@ Sphere::Sphere(Point3D center, double r, RGBColor c) : Object(center, c)
 Sphere::~Sphere()
 {
 }
-
-void Sphere::testObject(){
-	cout << "I am a Sphere\n";
-}
-
 
 double Sphere::rayCollision(Ray3D ray, double nearDist, RGBColor* assignColor){
 	// at^2 + bt + c = 0

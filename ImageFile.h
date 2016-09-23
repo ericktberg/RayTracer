@@ -22,8 +22,10 @@ class ImageFile
 		void setImageParams(int width, int height, int maxVal);
 
 	protected:
+		// saveFile destination
 		std::string destination;
 
+		// Image save parameters
 		int width;
 		int height;
 		int maxVal;

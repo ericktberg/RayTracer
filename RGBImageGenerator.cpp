@@ -14,8 +14,10 @@ RGBImageGenerator::~RGBImageGenerator()
 }
 
 RGBColor* RGBImageGenerator::generateSolid(RGBColor rgb){
-	// DRUNK COMMENT: Must be availabilitized to avoid error "cannot use constant expression" 
+	// Must be constructed as 'new' to avoid error "cannot use constant expression" 
 	RGBColor* image;
+
+	//TODO: is this a memory leak?
 	image = new RGBColor[height * width];
 
 	for (int i = 0; i < width; i++){
@@ -28,6 +30,8 @@ RGBColor* RGBImageGenerator::generateSolid(RGBColor rgb){
 
 RGBColor* RGBImageGenerator::generateGradient(RGBColor topColor, RGBColor bottomColor){
 	RGBColor* image;
+
+	//TODO: this too?
 	image = new RGBColor[height * width];
 
 	//linear gradient coefficients
