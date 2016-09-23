@@ -1,6 +1,7 @@
 #pragma once
 #include "Point3D.h"
 #include "Vector3D.h"
+#include "Ray3D.h"
 #include "RGBColor.h"
 
 class Object
@@ -20,6 +21,10 @@ class Object
 		void setLocation(double x, double y, double z);
 		void setObjectColor(int r, int g, int b);
 		void setOrientation(Vector3D v, Vector3D w);
+
+		// Returns point of collision. 
+		virtual void testObject();
+		virtual double rayCollision(Ray3D ray, double nearDist, RGBColor* assignColor);
 
 	protected:
 

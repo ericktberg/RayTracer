@@ -17,14 +17,21 @@
 class Camera : public Object
 {
 	public:
-		Camera(Point3D xyz = { 0, 0, 0 }, Vector3D viewingDir = { 1, 0, 0 }, Vector3D upDir = { 0, 0, 1 }, double dist = 1, double fov = 45);
+		Camera(Point3D xyz, Vector3D viewingDir, Vector3D upDir, double dist, double fov);
 		~Camera();
 
+		Basis3D getBasis();
+		Plane getViewPlane();
+		double getViewDistance();
+		double getFovV();
+
+		// Part of render process
+		void generateViewingPlane(int pixHeight, int pixWidth);
+
 	private:
-		Basis3D basis;
 		Plane viewPlane;
+		Basis3D basis;
 		double viewDistance; // Distance to viewing plane
 		double fovV; // Vertical Field of View in degrees
 
-		void generateViewingPlane(int pixHeight, int pixWidth);
 };

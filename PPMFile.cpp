@@ -1,3 +1,4 @@
+#pragma once
 #include "PPMFile.h"
 #include "Parser.h"
 

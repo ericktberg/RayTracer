@@ -8,9 +8,9 @@
 struct Vector3D {
 
 	// Common constructor. Default <0,0,0>
-	Vector3D(double a = 0, double b = 0, double c = 0) : x(a), y(b), z(c) {};
+	Vector3D(double a = 0, double b = 0, double c = 0) : x(a), y(b), z(c) { normalize(); };
 	// Constructs based on subtraction of points, p1 from p2.
-	Vector3D(Point3D p2, Point3D p1) : x(p2.x - p1.x), y(p2.y - p1.y), z(p2.z - p1.z) {};
+	Vector3D(Point3D p2, Point3D p1) : x(p2.x - p1.x), y(p2.y - p1.y), z(p2.z - p1.z) { normalize(); };
 
 	double x;
 	double y;
@@ -20,10 +20,16 @@ struct Vector3D {
 	Vector3D crossProduct(Vector3D v2){
 		Vector3D result;
 		result.x = y * v2.z - z * v2.y;
-		result.y = x * v2.z - z * v2.x;
+		result.y = -(x * v2.z - z * v2.x);
 		result.z = x * v2.y - y * v2.x;
+		result.normalize();
 		return result;
 	};
+
+	double dot(Vector3D v2){
+		double result = x * v2.x + y * v2.y + z * v2.z;
+		return result;
+	}
 
 	void normalize(){
 		double norm = sqrt(x*x + y*y + z*z);
@@ -47,10 +53,6 @@ struct Basis3D {
 		w = c;
 		u = w.crossProduct(b);
 		v = u.crossProduct(w);
-		
-		u.normalize();
-		v.normalize();
-		w.normalize();
 	};
 
 	Vector3D u;

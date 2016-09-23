@@ -13,6 +13,11 @@ struct RGBColor{
 	int r;
 	int g;
 	int b;
+	void setColor(RGBColor newColor){
+		r = newColor.r;
+		g = newColor.g;
+		b = newColor.b;
+	}
 
 	void clamp(){
 		r = r > 255 ? 255 : (r < 0 ? 0 : r);

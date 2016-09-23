@@ -1,4 +1,6 @@
 #pragma once
+#include "Vector3D.h"
+#include "Point3D.h"
 
 struct Plane {
 	Plane(Point3D center, double height, double width, Basis3D basis) {
