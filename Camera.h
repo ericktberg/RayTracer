@@ -14,7 +14,7 @@
 #include "Point3D.h"
 
 // TODO: rethink camera's implementation as an Object.
-class Camera : public Object
+class Camera
 {
 	public:
 		Camera();
@@ -23,6 +23,7 @@ class Camera : public Object
 
 		Basis3D getBasis();
 		Plane getViewPlane();
+		Point3D getEyeLocation();
 		double getViewDistance();
 		double getFovV();
 
@@ -35,6 +36,7 @@ class Camera : public Object
 
 	private:
 		Plane viewPlane; // Viewing plane. Created on render
+		Point3D eye; // eye origin
 		Basis3D basis; // Definition of viewing direction and camera angle
 		double viewDistance; // Distance to viewing plane
 		double fovV; // Vertical Field of View in degrees

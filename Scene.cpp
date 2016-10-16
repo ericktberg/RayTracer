@@ -1,25 +1,34 @@
 #include "Scene.h"
 #include "Sphere.h"
 
-Scene::Scene(){
-	objects = new Object*[128];
-	numObjects = 0;
-}
-Scene::Scene(RGBColor bkg = { 0, 0, 0 }) 
+using namespace std;
+
+Scene::Scene() : numObjects(0), numLights(0), numMaterials(0)
 {
-	bkgColor = bkg;
-	objects = new Object*[128];
-	numObjects = 0;
+}
+Scene::Scene(RGBColor bkg) : numObjects(0), numLights(0), numMaterials(0), bkgColor(bkg)
+{
 }
 
 Scene::~Scene()
 {
-	// TODO: Debug memory error so objects list stops leaking memory. delete[] and delete currently error out.
 }
 
-Object** Scene::getObjects(){
-	return objects;
+vector<Object*> Scene::getObjects(){
+	return sceneObjects;
 }
+vector<Light*> Scene::getLights(){
+	return sceneLights;
+}
+vector<Material*> Scene::getMaterials(){
+	return sceneMaterials;
+}
+
+Material* Scene::materialOf(int objectIndex){
+	int materialIndex = materialMap[objectIndex];
+	return sceneMaterials[materialIndex];
+}
+
 
 int Scene::getNumObjects(){
 	return numObjects;
@@ -34,7 +43,17 @@ void Scene::setBkgColor(RGBColor rgb){
 	bkgColor = rgb;
 }
 
+void Scene::addMaterial(Material* newMaterial){
+	sceneMaterials.push_back(newMaterial);
+	currentMaterial = numMaterials;
+	numMaterials++;
+}
+void Scene::addLight(Light* newLight){
+	sceneLights.push_back(newLight);
+	numLights++;
+}
 void Scene::addObject(Object* newObject){
-	objects[numObjects] = newObject;
+	sceneObjects.push_back(newObject);
+	materialMap[numObjects] = currentMaterial;
 	numObjects++;
 }

@@ -6,52 +6,45 @@
 
 #pragma once
 #include "Point3D.h"
-#include <math.h>
 
 
 // Abstraction for 3D vectors. 
-// TODO: Migrate to class
-struct Vector3D {
+class Vector3D {
+	public:
+		double x;
+		double y;
+		double z;
+		double length;
 
-	// Common constructor. Default <0,0,0>
-	Vector3D(double a = 0, double b = 0, double c = 0) : x(a), y(b), z(c) { normalize(); };
+		//Multiply a vector by a scalar
+		friend Vector3D operator*(Vector3D vector, double scalar);
+		//Divide a vector by a scalar
+		friend Vector3D operator/(Vector3D vector, double scalar);
+		//Average two vectors together (produces unit-length output)
+		friend Vector3D operator+(Vector3D vector1, Vector3D vector2);
 
-	// A vector is the result of a point 2 from point 1
-	Vector3D(Point3D p2, Point3D p1) : x(p2.x - p1.x), y(p2.y - p1.y), z(p2.z - p1.z) { normalize(); };
 
-	double x;
-	double y;
-	double z; 
+		// Common constructor. Default <0,0,0>
+		Vector3D(double a = 0, double b = 0, double c = 0);
+
+		// A vector is the result of a subtracting point 1 from point 2
+		Vector3D(Point3D point2, Point3D point1);
+
+		//Create a new vector orthogonal to this and given vector
+		Vector3D crossProduct(Vector3D vector2);
+
+		// Perform inner product on this and given vector
+		double dot(Vector3D vector2);
+
+		int isParallel(Vector3D vector2);
+		int isOrthogonal(Vector3D vector2);
+
+		// Convert vector to unit length
+		void normalize();
 	
-	//Create a new vector orthogonal to this and given vector
-	Vector3D crossProduct(Vector3D v2){
-		Vector3D result;
-		result.x = y * v2.z - z * v2.y;
-		result.y = -(x * v2.z - z * v2.x);
-		result.z = x * v2.y - y * v2.x;
-		result.normalize();
-		return result;
-	};
+		// Calculate a point at the given distance along this vector
+		Point3D getPointAt(double distance);
 
-	// Perform inner product on this and given vector
-	double dot(Vector3D v2){
-		double result = x * v2.x + y * v2.y + z * v2.z;
-		return result;
-	}
-
-	// Convert vector to unit length
-	void normalize(){
-		double norm = sqrt(x*x + y*y + z*z);
-		x = x / norm;
-		y = y / norm;
-		z = z / norm;
-	};
-	
-	// Calculate a point at the given distance along this vector
-	Point3D getPointAt(double distance){
-		Point3D result = { x*distance, y*distance, z*distance };
-		return result;
-	}
 };
 
 

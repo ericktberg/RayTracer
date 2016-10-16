@@ -14,7 +14,7 @@ PPMFile::PPMFile(string dest) : ImageFile(dest)
 	type = "P3";
 }
 
-PPMFile::PPMFile(string dest, int w, int h, int maxV) : ImageFile(dest, w, h, maxV)
+PPMFile::PPMFile(string dest, int maxV) : ImageFile(dest, maxV)
 {
 	type = "P3";
 }
@@ -23,30 +23,26 @@ PPMFile::~PPMFile()
 {
 }
 
-
-int PPMFile::getWidth(){
-	return ImageFile::getWidth();
-}
-int PPMFile::getHeight(){
-	return ImageFile::getHeight();
-}
 int PPMFile::getMaxVal(){
 	return ImageFile::getMaxVal();
 }
 
-void PPMFile::writeToFile(RGBColor* image){
+void PPMFile::writeToFile(RenderFrame* frame){
 	ofstream saveFile(destination + ".ppm");
-	saveFile << ppmHeader() << convertImage(image);
+	RGBColor* image = frame->getPixelBuf();
+	int width = frame->getWidth();
+	int height = frame->getHeight();
+	saveFile << ppmHeader(width, height) << convertImage(image, width, height);
 	saveFile.close();
 }
 
-string PPMFile::ppmHeader(){
+string PPMFile::ppmHeader(int width, int height){
 	stringstream header;
 	header << type << "\n" << width << " " << height << "\n" << maxVal << "\n";
 	return header.str();
 }
 
-string PPMFile::convertImage(RGBColor* image){
+string PPMFile::convertImage(RGBColor* image, int width, int height){
 	stringstream outputImage;
 	for (int i = 0; i < width*height; i++){
 		outputImage << image[i].rConvert(maxVal) << " " << image[i].gConvert(maxVal) << " " << image[i].bConvert(maxVal) << "\n";

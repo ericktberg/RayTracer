@@ -18,7 +18,12 @@ Sphere::~Sphere()
 {
 }
 
-double Sphere::rayCollision(Ray3D ray, double nearDist, RGBColor* assignColor){
+Vector3D Sphere::getNormal(Point3D surfacePoint){
+	Vector3D normal(surfacePoint,location);
+	return normal/radius;
+}
+
+double Sphere::rayCollision(Ray3D ray){
 	// at^2 + bt + c = 0
 	double t;
 	
@@ -43,20 +48,12 @@ double Sphere::rayCollision(Ray3D ray, double nearDist, RGBColor* assignColor){
 		return -1;
 	}
 	//graze
-	else if (discriminant = 0) {
+	else if (discriminant == 0) {
 		t = -b / 2;
 	}
 	//pierce
 	else {
 		t = min( (-b + sqrt(discriminant)) / 2, (-b - sqrt(discriminant)) / 2);
 	}
-
-	//not closer than other objects
-	if (nearDist > 0 && nearDist < t){
-		return nearDist;
-	}
-
-	assignColor->setColor(objectColor);
-
 	return t;
 }

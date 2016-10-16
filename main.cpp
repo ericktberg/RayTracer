@@ -7,6 +7,7 @@
 #include "Point3D.h"
 #include "PPMFile.h"
 #include "RenderEngine.h"
+#include "RenderFrame.h"
 #include "RGBColor.h"
 #include "RGBImageGenerator.h"
 #include "Scene.h"
@@ -37,25 +38,40 @@ void Assignment0(){
 	RGBImageGenerator image(ppm.getWidth(), ppm.getHeight(), ppm.getMaxVal());
 	RGBColor top = { 0, 0, 0 };
 	RGBColor bottom = { 255, 255, 255 };
-
-	ppm.writeToFile(image.generateGradient(top, bottom));
+	//does not work anymore due to RenderFrame changes
+	//ppm.writeToFile(image.generateGradient(top, bottom));
 }
 
 void Assignment1(){
 
 }
 
-int main(){
-	RenderEngine renderer;
+int main(int argc, char* argv[]){
+	if (argc < 2){
+		//TODO: Better message
+		cerr << "Include input file name\n" << "RENDER ABORTED";
+		return -1;
+	}
+	string inputFile = argv[1];
+	string outputFile = inputFile.substr(0, inputFile.length() - 4);
+
+
 	SceneParser parser;
+
+	//Objects to parse file contents into.
+	RenderEngine renderer;
 	Scene myScene;
 	Camera mainCam;
-	parser.parseSceneFile(&renderer, &myScene, &mainCam, "assign1a.txt");
-	//Camera mainCam({ 0, 0, 0 }, { 0, .5, 1 }, { 0, 0, 1 }, 1, 90);
+	RenderFrame frame;
+
+	if (parser.parseSceneFile(&renderer, &myScene, &mainCam, &frame, inputFile)){
+		cout << "RENDER ABORTED";
+		return 0;
+	}
 
 	//TODO: incorporate only 1 description of height/width in render constructor.
-	PPMFile ppm("rendered", renderer.getWidth(), renderer.getHeight(), 255);
+	PPMFile ppm(outputFile, 255);
 
-	ppm.writeToFile(renderer.render(mainCam, myScene));
+	ppm.writeToFile(renderer.render(mainCam, myScene, &frame));
 	return 0;
 }

@@ -22,6 +22,11 @@ struct Plane {
 	// Default plane.
 	Plane() : ul({ -1, 0, 1 }), ur({ 1, 0, 1 }), ll({ -1, 0, -1 }), lr({ 1, 0, -1 }) {};
 
+	Point3D getUL(){ return ul; };
+	Point3D getUR(){ return ur; };
+	Point3D getLL(){ return ll; };
+	Point3D getLR(){ return lr; };
+
 	// Create plane from 4 points
 	Plane(Point3D ul, Point3D ur, Point3D ll, Point3D lr) : ul(ul), ur(ur), ll(ll), lr(lr) {};
 

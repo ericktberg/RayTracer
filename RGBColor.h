@@ -15,6 +15,10 @@ struct RGBColor{
 	double g;
 	double b;
 
+	// multiply by operator
+	friend RGBColor operator*(RGBColor, double);
+	friend RGBColor operator+(RGBColor, RGBColor);
+
 	int rConvert(int maxVal){
 		return (int)(maxVal*r);
 	}

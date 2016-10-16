@@ -12,6 +12,7 @@ class ImageFile
 {
 	public:
 		ImageFile(std::string destination);
+		ImageFile(std::string destination, int maxVal);
 		ImageFile(std::string destination, int width, int height, int maxVal);
 		virtual ~ImageFile();
 

@@ -9,6 +9,13 @@ ImageFile::ImageFile(string fileName)
 	destination = fileName;
 }
 
+ImageFile::ImageFile(string fileName, int maxV)
+{
+	destination = fileName;
+	maxVal = maxV;
+}
+
+
 ImageFile::ImageFile(string fileName, int w, int h, int maxV)
 {
 	destination = fileName;

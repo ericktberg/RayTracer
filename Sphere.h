@@ -19,9 +19,10 @@ class Sphere : public Object
 		~Sphere();
 
 		// Override of Object rayCollision. 
-		// Returns -1 on miss. Otherwise returns minimum of [ray intersection with object] and [nearDist]
-		// TODO: Reevaluate necessity of nearDist in rayTracing implementation.
-		double rayCollision(Ray3D ray, double nearDist, RGBColor* assignColor);
+		// Returns -1 on miss. Otherwise returns minimum ray distance to object
+		double rayCollision(Ray3D ray);
+
+		Vector3D getNormal(Point3D surfacePoint);
 
 	private:
 		// Parametric definition parameters

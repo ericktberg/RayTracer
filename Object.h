@@ -14,10 +14,6 @@
 class Object
 {
 	public:
-		Object(double x = 0, double y = 0, double z = 0, int r = 0, int g = 0, int b = 0);
-		Object(RGBColor rgb, double x = 0, double y = 0, double z = 0);
-		Object(Point3D xyz, int r = 0, int g = 0, int b = 0);
-		// Currently, only used constructor
 		Object(Point3D xyz, RGBColor rgb);
 
 		virtual ~Object();
@@ -34,7 +30,9 @@ class Object
  
 		// ::Will calculate collision of rays based on triangles in object::
 		// Override in case of derived parametric object.
-		virtual double rayCollision(Ray3D ray, double nearDist, RGBColor* assignColor);
+		virtual double rayCollision(Ray3D ray);
+
+		virtual Vector3D getNormal(Point3D surfacePoint) const;
 
 	protected:
 
