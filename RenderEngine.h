@@ -20,7 +20,6 @@ class RenderEngine
 {
 public:
 	RenderEngine();
-	RenderEngine(double shadow_samples);
 	~RenderEngine();
 	
 	// Flagship function of program.
@@ -33,8 +32,8 @@ private:
 	void traceRay(const Scene& scene, const Ray3D& ray, ray::RayPayload* payload);
 	//calculates the pixel color given an object, its material, and a list of all the lights in the scene.
 	RGBColor shadeRay(const int objectID, const Scene& scene, const Point3D& intersectionPoint, const Point3D& eye);
-	double sendShadowPacket(const Scene& scene, light::Light* light, const Point3D& startingPoint);
 
-	int shadow_samples_;
+	//Sends a shadow packet using the light's parameters for sample information
+	double sendShadowPacket(const Scene& scene, const light::Light* light, const Point3D& startingPoint);
 };
 

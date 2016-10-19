@@ -13,8 +13,7 @@
 
 using std::string;
 
-RenderEngine::RenderEngine() : shadow_samples_(64) {}
-RenderEngine::RenderEngine(double shadow_samples) : shadow_samples_(shadow_samples) {}
+RenderEngine::RenderEngine() {}
 
 RenderEngine::~RenderEngine()
 {
@@ -24,11 +23,12 @@ void RenderEngine::traceRay(const Scene& scene, const Ray3D& ray, ray::RayPayloa
 
 	// Find minimum distance to an object and color of it
 	int numObjects = scene.get_num_objects();
+	//std::cout << "num_objects: " << numObjects << std::endl;
 	double minDistance = -1;
 	int closestObj = -1;
 	for (int k = 0; k < numObjects; k++){
 
-		Object* currentObject = scene.object_at(k);
+		const Object* currentObject = scene.object_at(k);
 		double distance = currentObject->rayCollision(ray);
 
 		//Test for relative distance
@@ -36,6 +36,7 @@ void RenderEngine::traceRay(const Scene& scene, const Ray3D& ray, ray::RayPayloa
 		int isNearer = (minDistance > 0 && minDistance > distance) || minDistance < 0;
 
 		if (isNearer && !isNegative){
+			//std::cout << "nearer: " << distance << std::endl;
 			minDistance = distance;
 			closestObj = k;
 			payload->set_object_id(closestObj);
@@ -56,7 +57,7 @@ RGBColor RenderEngine::shadeRay(const int objectID, const Scene& scene, const Po
 	RGBColor result = objectMaterial->calcAmbient();
 	for (int i = 0; i < numLights; i++){
 		using light::Light;
-		Light* light = scene.light_at(i);
+		const Light* light = scene.light_at(i);
 
 		//TODO? Currently has random behavior when object intersects area light
 		double shadow = sendShadowPacket(scene, light, intersectionPoint);
@@ -76,12 +77,14 @@ RGBColor RenderEngine::shadeRay(const int objectID, const Scene& scene, const Po
 	return result;
 }
 
-double RenderEngine::sendShadowPacket(const Scene& scene, light::Light* light, const Point3D& startingPoint){
+
+double RenderEngine::sendShadowPacket(const Scene& scene, const light::Light* light, const Point3D& startingPoint){
 	double shadow_level_inverted = 0;
+	int shadow_samples = light->num_samples();
 	int count = 0;
 	ray::RayPayload* payload = new ray::RayPayload();
-	for (int i = 0; i < shadow_samples_; i++){
-		Vector3D lightDir(light->sample_point(i), startingPoint);
+	for (int i = 0; i < shadow_samples; i++){
+		Vector3D lightDir(light->get_sample(i), startingPoint);
 		if (light->is_directional()){
 			lightDir = light->get_direction();
 		}
@@ -90,18 +93,14 @@ double RenderEngine::sendShadowPacket(const Scene& scene, light::Light* light, c
 		traceRay(scene, lightRay, payload);
 
 		double distance = payload->get_load_distance();
-		double distance_to_light = lightDir.length;
+		double distance_to_light = lightDir.length();
 
 		if (payload->get_object_id() >= 0 && .00001 < distance && distance < distance_to_light){
 			shadow_level_inverted++;
 		}
 
 		payload->reset();
-		// Only cast one shadow ray for point lights
-		if (!light->casts_soft()){
-			std::cout << "I shouldn't get here" << std::endl;
-			i = shadow_samples_;
-		}
+
 		count++;
 	}
 
@@ -144,9 +143,9 @@ RenderFrame* RenderEngine::render(Camera* renderCamera, const Scene& renderScene
 			Ray3D ray = { rayVec, eye };	
 			traceRay(renderScene, ray, payload);
 			int nearestObj = payload->get_object_id();
+			//std::cout << "payload: " << nearestObj << std::endl;
 			// save nearest color
 			if (nearestObj >= 0){
-				Material* objMaterial = renderScene.material_of(nearestObj);
 				renderImage[i*pxImageWidth + j] = shadeRay(nearestObj, renderScene, eye + rayVec.getPointAt(payload->get_load_distance()), eye);
 			}
 			else {

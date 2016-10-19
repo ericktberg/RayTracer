@@ -31,9 +31,9 @@ double Sphere::rayCollision(const Ray3D& ray) const{
 	// A = 1 when vectors are normalized
 	double a = 1;
 	// B = 2 * (Xd * (Xo-Xc) + Yd * (Yo-Yc) + Zd * (Zo-Zc))
-	double b =	2 * (ray.direction.x * (ray.origin.x() - centerPoint.x())
-				+ ray.direction.y * (ray.origin.y() - centerPoint.y())
-				+ ray.direction.z * (ray.origin.z() - centerPoint.z()));
+	double b =	2 * (ray.direction.x() * (ray.origin.x() - centerPoint.x())
+				+ ray.direction.y() * (ray.origin.y() - centerPoint.y())
+				+ ray.direction.z() * (ray.origin.z() - centerPoint.z()));
 
 	// C = (Xo-Xc)^2 + (Yo-Yc)^2 + (Zo-Zc)^2 - r^2
 	double c =	  (ray.origin.x() - centerPoint.x())*(ray.origin.x() - centerPoint.x())
@@ -56,5 +56,6 @@ double Sphere::rayCollision(const Ray3D& ray) const{
 	else {
 		t = min( (-b + sqrt(discriminant)) / 2, (-b - sqrt(discriminant)) / 2);
 	}
+	//std::cout << "sphere t: " << t << std::endl;
 	return t;
 }

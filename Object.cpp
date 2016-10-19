@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include <iostream>
 
 using namespace std;
 
@@ -18,5 +19,6 @@ Vector3D Object::getNormal(const Point3D& surfacePoint) const {
 
 //TODO: add default ray collision behavior for polygonal objects
 double Object::rayCollision(const Ray3D& ray) const{
+	//std::cout << "i shouldn't be here" << std::endl;
 	return 1;
 }

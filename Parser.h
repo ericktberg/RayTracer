@@ -26,5 +26,7 @@ class Parser
 		int parseTriple(std::stringstream* ss, double* x, double* y, double* z);
 
 		int parseDuple(std::stringstream* ss, int* x, int* y);
+		int parseTriple(std::stringstream* ss, int* x, int* y, int* z);
+
 };
 

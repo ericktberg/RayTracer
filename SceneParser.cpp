@@ -7,9 +7,11 @@
 #include "RenderFrame.h"
 #include "Scene.h"
 #include "Sphere.h"
+#include "Triangle.h"
 #include "Vector3D.h"
+#include "Vertex.h"
 
-
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -151,9 +153,22 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 			if (firstWord == "v"){
 				double vx, vy, vz;
 				if (parseTriple(&ss, &vx, &vy, &vz)){
-					cerr << "Line: " << lineCount << "::Vertex formatted improperly::\n    Syntax: v [x] [y] [z]";
+					cerr << "Line: " << lineCount << "::Vertex formatted improperly::\n    Syntax: v [x] [y] [z]" << endl;
 					return -1;
 				}
+				sceneTarget->add_vertex(new object::Vertex(vx, vy, vz));
+			}
+			if (firstWord == "f"){
+				int v1, v2, v3;
+				if (parseTriple(&ss, &v1, &v2, &v3)){
+					cerr << "Line: " << lineCount << "::Face formatted improperly::\n    Syntax f [v1] [v2] [v3]" << endl;
+					return -1;
+				}
+				if (sceneTarget->num_vertices() < std::max(v1,std::max(v2,v3)) || v1 == v2 || v2 == v3){
+					cerr << "Line: " << lineCount << "::Face must have three unique, previously defined vertices." << endl;
+					return -1;
+				}
+				sceneTarget->addObject(new object::Triangle(sceneTarget->vertex_at(v1), sceneTarget->vertex_at(v2), sceneTarget->vertex_at(v3)));
 			}
 			lineCount++;
 		}

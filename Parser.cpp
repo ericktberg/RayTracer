@@ -40,6 +40,12 @@ int Parser::parseTriple(stringstream* ss, double* x, double* y, double* z){
 	return ss->fail();
 }
 
+int Parser::parseTriple(stringstream* ss, int* x, int* y, int* z){
+	*ss >> *x >> *y >> *z;
+	cout << *x << " " << *y << " " << *z << "\n";
+	return ss->fail();
+}
+
 string Parser::getFileStripped(string sourceText){
 	istringstream ss(sourceText);
 	string file = "";

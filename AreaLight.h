@@ -9,14 +9,16 @@ namespace light{
 class AreaLight : public Light
 {
 public:
-	AreaLight(int x, int y, int z, int type, RGBColor hue, double radius);
+	AreaLight(int x, int y, int z, int type, RGBColor hue, double radius, int num_samples = 32);
 	~AreaLight();
 	
-	Point3D sample_point(int index);
 
 	int casts_soft() const;
-	Point3D get_location() const;
 private:
+
+	//Samples Point from random point cloud within radius
+	Point3D get_location() const;
+
 	double radius;
 };
 
