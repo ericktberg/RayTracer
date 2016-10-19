@@ -7,24 +7,29 @@
 #include "RGBColor.h"
 #include "Scene.h"
 
+#include <iostream>
 #include <vector>
 
 
-using namespace std;
+using std::string;
 
-RenderEngine::RenderEngine() {}
+RenderEngine::RenderEngine() : shadow_samples_(64) {}
+RenderEngine::RenderEngine(double shadow_samples) : shadow_samples_(shadow_samples) {}
 
 RenderEngine::~RenderEngine()
 {
 }
 
-int RenderEngine::traceRay(vector<Object*> objects, Ray3D* ray){
+void RenderEngine::traceRay(const Scene& scene, const Ray3D& ray, ray::RayPayload* payload){
+
 	// Find minimum distance to an object and color of it
-	int numObjects = objects.size();
+	int numObjects = scene.get_num_objects();
 	double minDistance = -1;
 	int closestObj = -1;
 	for (int k = 0; k < numObjects; k++){
-		double distance = objects[k]->rayCollision(*ray);
+
+		Object* currentObject = scene.object_at(k);
+		double distance = currentObject->rayCollision(ray);
 
 		//Test for relative distance
 		int isNegative = distance < 0;
@@ -33,65 +38,91 @@ int RenderEngine::traceRay(vector<Object*> objects, Ray3D* ray){
 		if (isNearer && !isNegative){
 			minDistance = distance;
 			closestObj = k;
+			payload->set_object_id(closestObj);
 		}
+
 	}
-	//ray starts unitLength, after multiplication it has unit length, but stores length as distance to intersection point
-	// ray.direction.getPointAt(ray.direction.length) is intersection point
-	//TODO: Make this not such a shitty design
-	ray->direction = ray->direction*minDistance;
-	return closestObj;
+	payload->set_distance(minDistance);
 }
 
-RGBColor RenderEngine::shadeRay(const Object& object, const Point3D& intersectionPoint, const Point3D& eye, vector<Light*> lightList, const Material& objectMaterial){
-	int numLights = lightList.size();
+RGBColor RenderEngine::shadeRay(const int objectID, const Scene& scene, const Point3D& intersectionPoint, const Point3D& eye){
+	int numLights = scene.get_num_lights();
+	const Object* object = scene.object_at(objectID);
+	const Material* objectMaterial = scene.material_of(objectID);
 
 	Vector3D viewDir(eye, intersectionPoint);
-	Vector3D surfaceNormal = object.getNormal(intersectionPoint);
+	Vector3D surfaceNormal = object->getNormal(intersectionPoint);
 	
-	RGBColor result = objectMaterial.calcAmbient();
+	RGBColor result = objectMaterial->calcAmbient();
+	for (int i = 0; i < numLights; i++){
+		using light::Light;
+		Light* light = scene.light_at(i);
 
-	for (int i = 0; i < lightList.size(); i++){
-		// ** TODO: Rethink distances and rays and vectors blahblahblah **
-
-		//Calculate light information and vectors
-		Light* light = lightList[i];
-		Vector3D lightDir(light->get_location(), intersectionPoint);
-		if (light->is_directional()){
-			lightDir = light->get_direction();
-		}
+		//TODO? Currently has random behavior when object intersects area light
+		double shadow = sendShadowPacket(scene, light, intersectionPoint);
+		
+		
+		RGBColor diffSpec = { 0, 0, 0 };
+		Vector3D lightDir(light->get_center(), intersectionPoint);
 		Vector3D h = viewDir + lightDir;
-
-		//Calculate Shadows for each light
-		double shadow = 1;
-		double distanceToLight = lightDir.length;
-		Ray3D lightRay = { lightDir, intersectionPoint };
-		if ((traceRay(sceneObjects, &lightRay) >= 0) && lightRay.direction.length < distanceToLight && lightRay.direction.length > .00001){
-			shadow = 0;
-		}
-
+		diffSpec = diffSpec + objectMaterial->calcDiffSpec(surfaceNormal, lightDir, h, light->get_color(), shadow);
 		//Add specular and diffuse onto ambient and other lights
-		result = result + objectMaterial.calcDiffSpec(surfaceNormal, lightDir, h, light->get_color(), shadow);
+		result = result + diffSpec;
 		result.clamp();
+
 	}
+	
 
 	return result;
 }
 
+double RenderEngine::sendShadowPacket(const Scene& scene, light::Light* light, const Point3D& startingPoint){
+	double shadow_level_inverted = 0;
+	int count = 0;
+	ray::RayPayload* payload = new ray::RayPayload();
+	for (int i = 0; i < shadow_samples_; i++){
+		Vector3D lightDir(light->sample_point(i), startingPoint);
+		if (light->is_directional()){
+			lightDir = light->get_direction();
+		}
+		
+		Ray3D lightRay = { lightDir, startingPoint };
+		traceRay(scene, lightRay, payload);
 
-RenderFrame* RenderEngine::render(const Camera& renderCamera, const Scene& renderScene, RenderFrame* frame){
+		double distance = payload->get_load_distance();
+		double distance_to_light = lightDir.length;
+
+		if (payload->get_object_id() >= 0 && .00001 < distance && distance < distance_to_light){
+			shadow_level_inverted++;
+		}
+
+		payload->reset();
+		// Only cast one shadow ray for point lights
+		if (!light->casts_soft()){
+			std::cout << "I shouldn't get here" << std::endl;
+			i = shadow_samples_;
+		}
+		count++;
+	}
+
+	if (payload){
+		delete payload;
+	}
+	return 1.0 - (shadow_level_inverted / count);
+}
+
+
+RenderFrame* RenderEngine::render(Camera* renderCamera, const Scene& renderScene, RenderFrame* frame){
 	// Initialize necessary objects
 	int pxImageHeight = frame->getHeight();
 	int pxImageWidth = frame->getWidth();
 	RGBColor* renderImage = frame->getPixelBuf();
 
-	renderCamera.generateViewingPlane(pxImageHeight, pxImageWidth);
-	Plane viewPlane = renderCamera.getViewPlane();
-	sceneObjects = renderScene.getObjects();
-	vector<Light*> sceneLights = renderScene.getLights();
+	renderCamera->generateViewingPlane(pxImageHeight, pxImageWidth);
+	Plane viewPlane = renderCamera->getViewPlane();
 
 	// initialize background color.
-	RGBColor initColor = renderScene.getBkgColor();
-	// TODO? Split ray tracing implementation away from renderer?
+	RGBColor initColor = renderScene.get_bkg_color();
 
 	// Trace rays (single-threaded now for simplicity)
 	// Mapping from viewPlane to image pixels
@@ -99,9 +130,9 @@ RenderFrame* RenderEngine::render(const Camera& renderCamera, const Scene& rende
 	Point3D deltaH = ( viewPlane.ll - viewPlane.ul ) / (pxImageHeight - 1);
 	Point3D deltaW = (viewPlane.ur - viewPlane.ul) / (pxImageWidth - 1);
 
-	Point3D eye = renderCamera.getEyeLocation();
-
-	int numObjects = sceneObjects.size();
+	Point3D eye = renderCamera->getEyeLocation();
+	int numObjects = renderScene.get_num_objects();
+	ray::RayPayload* payload = new ray::RayPayload();
 
 	for (int i = 0; i < pxImageHeight; i++){
 		for (int j = 0; j < pxImageWidth; j++){
@@ -110,18 +141,24 @@ RenderFrame* RenderEngine::render(const Camera& renderCamera, const Scene& rende
 			
 			// Calculate ray from pixel -> eye
 			Vector3D rayVec(pixel, eye);
-			Ray3D ray = { rayVec, eye };
-			int nearestObj = traceRay(sceneObjects, &ray);
-			
+			Ray3D ray = { rayVec, eye };	
+			traceRay(renderScene, ray, payload);
+			int nearestObj = payload->get_object_id();
 			// save nearest color
 			if (nearestObj >= 0){
-				Material* objMaterial = renderScene.materialOf(nearestObj);
-				renderImage[i*pxImageWidth + j] = shadeRay(*sceneObjects[nearestObj], eye + ray.direction.getPointAt(ray.direction.length), eye, sceneLights, objMaterial);
+				Material* objMaterial = renderScene.material_of(nearestObj);
+				renderImage[i*pxImageWidth + j] = shadeRay(nearestObj, renderScene, eye + rayVec.getPointAt(payload->get_load_distance()), eye);
 			}
 			else {
 				renderImage[i*pxImageWidth + j] = initColor;
 			}
+
+			payload->reset();
 		}
+	}
+
+	if (payload){
+		delete payload;
 	}
 	//pixelbuffer has been altered to contain the image
 	return frame;

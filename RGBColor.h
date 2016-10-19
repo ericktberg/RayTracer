@@ -15,9 +15,6 @@ struct RGBColor{
 	double g;
 	double b;
 
-	// multiply by operator
-	friend RGBColor operator*(RGBColor, double);
-	friend RGBColor operator+(RGBColor, RGBColor);
 
 	int rConvert(int maxVal){
 		return (int)(maxVal*r);
@@ -42,5 +39,33 @@ struct RGBColor{
 		r = r > 1.0 ? 1.0 : (r < 0 ? 0 : r);
 		g = g > 1.0 ? 1.0 : (g < 0 ? 0 : g);
 		b = b > 1.0 ? 1.0 : (b < 0 ? 0 : b);
+	}
+
+	friend RGBColor operator/(RGBColor rgb, int scalar){
+		double r = rgb.r / scalar;
+		double g = rgb.g / scalar;
+		double b = rgb.b / scalar;
+		RGBColor result = { r, g, b };
+		result.clamp();
+		return result;
+	}
+
+
+	friend RGBColor operator*(RGBColor rgb, double scalar){
+		double r = rgb.r * scalar;
+		double g = rgb.g * scalar;
+		double b = rgb.b * scalar;
+		RGBColor result = { r, g, b };
+		result.clamp();
+		return result;
+	}
+
+	friend RGBColor operator+(RGBColor rgb1, RGBColor rgb2){
+		double r = rgb1.r + rgb2.r;
+		double g = rgb1.g + rgb2.g;
+		double b = rgb1.b + rgb2.b;
+		RGBColor result = { r, g, b };
+		result.clamp();
+		return result;
 	}
 };

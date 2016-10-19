@@ -16,13 +16,3 @@ void RenderFrame::setImageDimensions(int h, int w){
 	width = w;
 	pixelBuffer = new RGBColor[height * width];
 }
-
-int RenderFrame::getHeight(){
-	return height;
-}
-int RenderFrame::getWidth(){
-	return width;
-}
-RGBColor* RenderFrame::getPixelBuf(){
-	return pixelBuffer;
-}

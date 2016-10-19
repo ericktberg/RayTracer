@@ -11,11 +11,6 @@
 // Abstraction for 3D vectors. 
 class Vector3D {
 	public:
-		double x;
-		double y;
-		double z;
-		double length;
-
 		//Multiply a vector by a scalar
 		friend Vector3D operator*(Vector3D vector, double scalar);
 		//Divide a vector by a scalar
@@ -45,6 +40,19 @@ class Vector3D {
 		// Calculate a point at the given distance along this vector
 		Point3D getPointAt(double distance);
 
+		double x() const { return x_; };
+		double y() const { return y_; };
+		double z() const { return z_; };
+		double length() const { return length_; };
+		void x(double x) { x_ = x; };
+		void y(double y) { y_ = y; };
+		void z(double z) { z_ = z; };
+
+	private:
+		double x_;
+		double y_;
+		double z_;
+		double length_;
 };
 
 
@@ -65,5 +73,3 @@ struct Basis3D {
 	Vector3D v;
 	Vector3D w;
 };
-
-

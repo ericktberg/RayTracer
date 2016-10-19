@@ -1,5 +1,6 @@
 #include "SceneParser.h"
 
+#include "AreaLight.h"
 #include "Camera.h"
 #include "Point3D.h"
 #include "RenderEngine.h"
@@ -113,7 +114,7 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 				}
 				RGBColor rgb = { r, g, b };
 				rgb.clamp();
-				sceneTarget->setBkgColor(rgb);
+				sceneTarget->set_bkg_color(rgb);
 			}
 			if (firstWord == "mtlcolor"){
 				double dr, dg, db, sr, sg, sb, a, d, s, n;
@@ -143,13 +144,20 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 				double x, y, z, w, r, g, b;
 				if (parseLight(&ss, &x, &y, &z, &w, &r, &g, &b)){
 					cerr << "Line: " << lineCount << "::Light formatted improperly::\n    Syntax: light [x] [y] [z] [w] [r] [g] [b]\n";
+					return -1;
 				}
-				sceneTarget->addLight(new Light(x, y, z, w, { r, g, b }));
+				sceneTarget->addLight(new light::AreaLight(x, y, z, w, { r, g, b }, .5));
+			}
+			if (firstWord == "v"){
+				double vx, vy, vz;
+				if (parseTriple(&ss, &vx, &vy, &vz)){
+					cerr << "Line: " << lineCount << "::Vertex formatted improperly::\n    Syntax: v [x] [y] [z]";
+					return -1;
+				}
 			}
 			lineCount++;
 		}
 
-		cout << viewdir.x << endl;
 		//Handle improper input
 		if (viewdir.isParallel(updir)){
 			cout << "Updir and Viewdir are coincident.\n";

@@ -72,6 +72,6 @@ int main(int argc, char* argv[]){
 	//TODO: incorporate only 1 description of height/width in render constructor.
 	PPMFile ppm(outputFile, 255);
 
-	ppm.writeToFile(renderer.render(mainCam, myScene, &frame));
+	ppm.writeToFile(renderer.render(&mainCam, myScene, &frame));
 	return 0;
 }

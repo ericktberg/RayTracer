@@ -9,9 +9,9 @@ class RenderFrame
 
 		void setImageDimensions(int height, int width);
 
-		int getHeight();
-		int getWidth();
-		RGBColor* getPixelBuf();
+		int getHeight() const { return height; };
+		int getWidth() const { return width; };
+		RGBColor* getPixelBuf() const { return pixelBuffer; };
 
 	private:
 		int height;

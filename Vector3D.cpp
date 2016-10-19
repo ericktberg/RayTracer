@@ -6,7 +6,7 @@
 Vector3D::Vector3D(double a, double b, double c) : x(a), y(b), z(c) { normalize(); };
 
 // A vector is the result of a point 2 from point 1
-Vector3D::Vector3D(Point3D p2, Point3D p1) : x(p2.x - p1.x), y(p2.y - p1.y), z(p2.z - p1.z) { normalize(); };
+Vector3D::Vector3D(Point3D p2, Point3D p1) : x(p2.x() - p1.x()), y(p2.y() - p1.y()), z(p2.z() - p1.z()) { normalize(); };
 
 Vector3D operator*(Vector3D v, double scalar){
 	return	{ v.x*scalar, v.y*scalar, v.z*scalar };
@@ -55,6 +55,8 @@ void Vector3D::normalize(){
 		y = y / norm;
 		z = z / norm;
 	}
+
+	//length == 0 iff this == {0,0,0}
 	length = norm;
 };
 

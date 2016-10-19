@@ -14,33 +14,9 @@ Scene::~Scene()
 {
 }
 
-vector<Object*> Scene::getObjects(){
-	return sceneObjects;
-}
-vector<Light*> Scene::getLights(){
-	return sceneLights;
-}
-vector<Material*> Scene::getMaterials(){
-	return sceneMaterials;
-}
-
-Material* Scene::materialOf(int objectIndex){
-	int materialIndex = materialMap[objectIndex];
+Material* Scene::material_of(int objectIndex) const{
+	int materialIndex = materialMap.at(objectIndex);
 	return sceneMaterials[materialIndex];
-}
-
-
-int Scene::getNumObjects(){
-	return numObjects;
-}
-
-RGBColor Scene::getBkgColor(){
-	return bkgColor;
-}
-
-
-void Scene::setBkgColor(RGBColor rgb){
-	bkgColor = rgb;
 }
 
 void Scene::addMaterial(Material* newMaterial){
@@ -48,7 +24,7 @@ void Scene::addMaterial(Material* newMaterial){
 	currentMaterial = numMaterials;
 	numMaterials++;
 }
-void Scene::addLight(Light* newLight){
+void Scene::addLight(light::Light* newLight){
 	sceneLights.push_back(newLight);
 	numLights++;
 }

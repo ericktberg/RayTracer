@@ -21,11 +21,11 @@ class Camera
 		Camera(Point3D xyz, Vector3D viewingDir, Vector3D upDir, double dist, double fov);
 		~Camera();
 
-		Basis3D getBasis();
-		Plane getViewPlane();
-		Point3D getEyeLocation();
-		double getViewDistance();
-		double getFovV();
+		Basis3D getBasis() const { return basis; };
+		Plane getViewPlane() const { return viewPlane; };
+		Point3D getEyeLocation() const { return eye; };
+		double getViewDistance() const { return viewDistance; };
+		double getFovV() const { return fovV; };
 
 		// Create a viewing plane based on camera basis
 		// Part of render process

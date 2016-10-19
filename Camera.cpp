@@ -16,10 +16,6 @@ Camera::~Camera()
 {
 }
 
-Basis3D Camera::getBasis(){	return basis; }
-Plane Camera::getViewPlane(){ return viewPlane; }
-Point3D Camera::getEyeLocation(){ return eye; }
-
 void Camera::resetParams(Point3D xyz, Vector3D viewingDir, Vector3D upDir, double dist, double fov){
 	eye = xyz;
 	basis = { upDir, viewingDir };

@@ -20,9 +20,9 @@ class Sphere : public Object
 
 		// Override of Object rayCollision. 
 		// Returns -1 on miss. Otherwise returns minimum ray distance to object
-		double rayCollision(Ray3D ray);
+		double rayCollision(const Ray3D& ray) const;
 
-		Vector3D getNormal(Point3D surfacePoint);
+		Vector3D getNormal(const Point3D& surfacePoint) const;
 
 	private:
 		// Parametric definition parameters
