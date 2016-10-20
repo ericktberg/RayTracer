@@ -14,7 +14,7 @@ public:
 	Vector3D get_levels() { return{ a, d, s }; };
 	double get_glossiness(){ return glossiness; };
 
-	virtual RGBColor calcAmbient() const;
+	virtual RGBColor calcAmbient(const RGBColor* override_color) const;
 	virtual RGBColor calcDiffSpec(Vector3D normalDir, Vector3D lightDir, Vector3D h, RGBColor lightColor, double shadow, const RGBColor* override_color) const;
 
 private:

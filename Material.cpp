@@ -15,8 +15,15 @@ Material::~Material()
 }
 
 
-RGBColor Material::calcAmbient() const{
-	return diffuse*a;
+RGBColor Material::calcAmbient(const RGBColor* override_color) const{
+	RGBColor color;
+	if (!override_color){
+		color = diffuse;
+	}
+	else{
+		color = *override_color;
+	}
+	return color*a;
 }
 //Currently implements Phong shading
 //TODO think of a way to implement separate shading models implicitly

@@ -33,7 +33,7 @@ namespace object{
 
 	UVCoord Sphere::get_uv(const Point3D& intersection) const{
 		Vector3D normal = getNormal(intersection);
-		double phi = acos(normal.z());
+		double phi = acos(-normal.z());
 		double theta = atan2(normal.y(), normal.x());
 		double v = phi / PI;
 		double u = (theta + PI) / (2 * PI);

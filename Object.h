@@ -27,7 +27,7 @@ namespace object{
 		RGBColor getObjectColor() const { return objectColor; };
 		Basis3D getOrientation() const { return orientation; };
 		virtual UVCoord get_uv(const Point3D& intersection) const { return { 0, 0 }; };
-		virtual int has_uvs() const { return -1; };
+		virtual int has_uvs() const { return 0; };
 		// Mutators
 		void setLocation(double x, double y, double z) { location = { x, y, z, }; };
 		void setObjectColor(double r, double g, double b) { objectColor = { r, g, b }; };

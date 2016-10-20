@@ -192,7 +192,7 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 					cerr << "Line: " << lineCount << "::Light formatted improperly::\n    Syntax: light [x] [y] [z] [w] [r] [g] [b]\n";
 					return -1;
 				}
-				sceneTarget->addLight(new light::Light(x, y, z, w, { r, g, b }));
+				sceneTarget->addLight(new light::AreaLight(x, y, z, w, { r, g, b }, .5));
 			}
 			if (firstWord == "v"){
 				double vx, vy, vz;

@@ -62,8 +62,9 @@ RGBColor RenderEngine::shadeRay(const int objectID, const Scene& scene, const Po
 	for (int i = 0; i < numLights; i++){
 		RGBColor* override_color;
 
-		if (texture_index >= 0){
+		if (texture_index >= 0 && object->has_uvs()){
 			texture = scene.texture_at(texture_index);
+
 			object::UVCoord uvs = object->get_uv(intersectionPoint);
 			override_color = &texture->get_pixel(uvs);
 		}

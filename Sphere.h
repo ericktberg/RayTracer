@@ -28,6 +28,7 @@ namespace object{
 		Vector3D getNormal(const Point3D& surfacePoint) const;
 
 		UVCoord get_uv(const Point3D& intersection) const;
+		int has_uvs() const { return 1; };
 
 	private:
 		// Parametric definition parameters
