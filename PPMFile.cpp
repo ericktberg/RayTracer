@@ -9,12 +9,7 @@
 
 using namespace std;
 
-PPMFile::PPMFile(string dest) : ImageFile(dest)
-{
-	type = "P3";
-}
-
-PPMFile::PPMFile(string dest, int maxV) : ImageFile(dest, maxV)
+PPMFile::PPMFile() : ImageFile()
 {
 	type = "P3";
 }
@@ -27,18 +22,42 @@ int PPMFile::getMaxVal(){
 	return ImageFile::getMaxVal();
 }
 
-void PPMFile::writeToFile(RenderFrame* frame){
+void PPMFile::writeToFile(RenderFrame* frame, std::string destination, int max_val){
+	maxVal = max_val;
 	ofstream saveFile(destination + ".ppm");
 	RGBColor* image = frame->getPixelBuf();
 	int width = frame->getWidth();
 	int height = frame->getHeight();
-	saveFile << ppmHeader(width, height) << convertImage(image, width, height);
+	saveFile << ppmHeader(width, height, maxVal) << convertImage(image, width, height);
 	saveFile.close();
 }
 
-string PPMFile::ppmHeader(int width, int height){
+void PPMFile::readFile(std::string file_name){
+	stringstream ss;
+	string line = "";
+	ifstream inputStream(file_name);
+	if (inputStream.is_open()){
+		int line_count = 0;
+		while (getline(inputStream, line)){
+			stringstream ss(line);
+			if (!line_count){
+				ss >> type >> width >> height >> maxVal;
+				std::cout << type << " : " << width << " : " << height << " : " << maxVal << std::endl;
+			}
+			else{
+				double r, g, b;
+				ss >> r >> g >> b;
+				//cout << r << " : " << g << " : " << b << endl;
+				image.push_back({ r/maxVal, g/maxVal, b/maxVal });
+			}
+			line_count++;		
+		}
+	}
+}
+
+string PPMFile::ppmHeader(int width, int height, int maxVal){
 	stringstream header;
-	header << type << "\n" << width << " " << height << "\n" << maxVal << "\n";
+	header << type << " " << width << " " << height << " " << maxVal << "\n";
 	return header.str();
 }
 

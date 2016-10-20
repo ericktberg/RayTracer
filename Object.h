@@ -10,11 +10,14 @@
 #include "Vector3D.h"
 #include "Ray3D.h"
 #include "RGBColor.h"
+#include "UVCoord.h"
 
-class Object
-{
+namespace object{
+
+	class Object
+	{
 	public:
-		
+
 		Object(Point3D xyz, RGBColor rgb = { 0, 0, 0 });
 
 		virtual ~Object();
@@ -23,12 +26,13 @@ class Object
 		Point3D getLocation() const { return location; };
 		RGBColor getObjectColor() const { return objectColor; };
 		Basis3D getOrientation() const { return orientation; };
-
+		virtual UVCoord get_uv(const Point3D& intersection) const { return { 0, 0 }; };
+		virtual int has_uvs() const { return -1; };
 		// Mutators
 		void setLocation(double x, double y, double z) { location = { x, y, z, }; };
 		void setObjectColor(double r, double g, double b) { objectColor = { r, g, b }; };
 		void setOrientation(Vector3D v, Vector3D w) { orientation = { v, w }; };
- 
+
 		// ::Will calculate collision of rays based on triangles in object::
 		// Override in case of derived parametric object.
 		virtual double rayCollision(const Ray3D& ray) const;
@@ -45,5 +49,6 @@ class Object
 
 	private:
 
-};
+	};
 
+}

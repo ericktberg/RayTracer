@@ -20,6 +20,7 @@ class Parser
 
 		// If source text is a file name, return the name, stripped of extension.
 		std::string getFileStripped(std::string sourceText);
+
 	protected:
 		int parseSingle(std::stringstream* ss, double* x);
 		int parseDuple(std::stringstream* ss, double* x, double* y);

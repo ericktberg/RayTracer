@@ -11,9 +11,12 @@
 #include "Point3D.h"
 #include "Ray3D.h"
 #include "RGBColor.h"
+#include "UVCoord.h"
 
-class Sphere : public Object
-{
+namespace object{
+
+	class Sphere : public Object
+	{
 	public:
 		Sphere(Point3D centerPoint, double r, RGBColor c);
 		~Sphere();
@@ -24,9 +27,12 @@ class Sphere : public Object
 
 		Vector3D getNormal(const Point3D& surfacePoint) const;
 
+		UVCoord get_uv(const Point3D& intersection) const;
+
 	private:
 		// Parametric definition parameters
 		double radius;
 		Point3D centerPoint;
-};
+	};
 
+}

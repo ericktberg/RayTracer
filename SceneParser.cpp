@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "Sphere.h"
 #include "Triangle.h"
+#include "UVCoord.h"
 #include "Vector3D.h"
 #include "Vertex.h"
 
@@ -17,7 +18,11 @@
 #include <sstream>
 #include <fstream>
 
-using namespace std;
+using std::endl;
+using std::stringstream;
+using std::string;
+using std::ifstream;
+using std::cerr;
 
 SceneParser::SceneParser()
 {
@@ -40,7 +45,6 @@ int SceneParser::parseEllipse(stringstream* ss, double* x, double* y, double* z,
 
 int SceneParser::parsePhongMtl(std::stringstream* ss, double* dr, double* dg, double* db, double* sr, double* sg, double* sb, double* a, double* d, double* s, double* n){
 	*ss >> *dr >> *dg >> *db >> *sr >> *sg >> *sb >> *a >> *d >> *s >> *n;
-	cout << *dr << *dg << *db << *sr << *sg << *sb << *a << *d << *s << *n;
 	return ss->fail();
 }
 int SceneParser::parseLight(std::stringstream* ss, double* x, double* y, double* z, double* w, double* r, double* g, double* b){
@@ -48,6 +52,33 @@ int SceneParser::parseLight(std::stringstream* ss, double* x, double* y, double*
 	return ss->fail();
 }
 
+int SceneParser::parseFace(std::stringstream* ss, int* v1, int* v2, int* v3, int* vt1, int* vt2, int* vt3, int* vn1, int* vn2, int* vn3){
+	skip47(ss, v1, vt1, vn1);
+	skip47(ss, v2, vt2, vn2);
+	skip47(ss, v3, vt3, vn3);
+	
+	return ss->fail();
+}
+
+void SceneParser::skip47(std::stringstream* ss, int* v, int* t, int*n){
+	char skip_char;
+	*ss >> *v;
+	if (!ss->eof()){
+		if (ss->peek() == '/'){
+			*ss >> skip_char;
+			if (ss->peek() != '/'){
+				*ss >> *t;
+			}
+
+			if (!ss->eof()){
+				if (ss->peek() == '/'){
+					*ss >> skip_char;
+					*ss >> *n;
+				}
+			}
+		}
+	}
+}
 
 int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, Camera* cameraTarget, RenderFrame* frameTarget, std::string inputFile){
 	int lineCount = 1;
@@ -62,6 +93,9 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 		Vector3D viewdir;
 		Vector3D updir;
 		double fovV;
+		std::vector <object::UVCoord> coord_list;
+		std::vector <Vector3D> normal_list;
+		object::UVCoord uv;
 
 		while (getline(inputStream, line)){
 			stringstream ss(line);
@@ -126,6 +160,16 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 				}
 				sceneTarget->addMaterial(new Material({ dr, dg, db }, { sr, sg, sb }, a, d, s, n));
 			}
+			if (firstWord == "texture"){
+				PPMFile* file = new PPMFile();
+				std::string file_name;
+				ss >> file_name;
+				if (ss.fail()){
+					return -1;
+				}
+				file->readFile(file_name);
+				sceneTarget->add_texture(file);
+			}
 			if (firstWord == "sphere"){
 				double cx, cy, cz, r;
 				if (parseSphere(&ss, &cx, &cy, &cz, &r)){
@@ -133,7 +177,7 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 					return -1;
 				}
 				Point3D center = { cx, cy, cz };
-				sceneTarget->addObject(new Sphere(center, r, currentMtlColor));
+				sceneTarget->addObject(new object::Sphere(center, r, currentMtlColor));
 			}
 			if (firstWord == "ellipsoid"){
 				double x, y, z, a, b, c;
@@ -148,7 +192,7 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 					cerr << "Line: " << lineCount << "::Light formatted improperly::\n    Syntax: light [x] [y] [z] [w] [r] [g] [b]\n";
 					return -1;
 				}
-				sceneTarget->addLight(new light::AreaLight(x, y, z, w, { r, g, b }, .5));
+				sceneTarget->addLight(new light::Light(x, y, z, w, { r, g, b }));
 			}
 			if (firstWord == "v"){
 				double vx, vy, vz;
@@ -158,24 +202,59 @@ int SceneParser::parseSceneFile(RenderEngine* renderTarget, Scene* sceneTarget, 
 				}
 				sceneTarget->add_vertex(new object::Vertex(vx, vy, vz));
 			}
+			if (firstWord == "vt"){
+				double u, v;
+				if (parseDuple(&ss, &u, &v)){
+					cerr << "Line: " << lineCount << "::Vertex Texture Coordinate formatted improperly::\n    Syntax: vt u v" << endl;
+					return -1;
+				}
+				uv = { u, v };
+				coord_list.push_back(uv);
+			}
+			if (firstWord == "vn"){
+				double vn1, vn2, vn3;
+				if (parseTriple(&ss, &vn1, &vn2, &vn3)){
+					return -1;
+				}
+				Vector3D normal(vn1, vn2, vn3);
+				normal_list.push_back(normal);
+			}
 			if (firstWord == "f"){
-				int v1, v2, v3;
-				if (parseTriple(&ss, &v1, &v2, &v3)){
-					cerr << "Line: " << lineCount << "::Face formatted improperly::\n    Syntax f [v1] [v2] [v3]" << endl;
+				int v1, v2, v3, vt1 = 0, vt2 = 0, vt3 = 0, vn1 = 0 , vn2 = 0, vn3 = 0;
+				if (parseFace(&ss, &v1, &v2, &v3, &vt1, &vt2, &vt3, &vn1, &vn2, &vn3)){
+					cerr << "Line: " << lineCount << "::Face formatted improperly::\n    Syntax f [v1]/[vt1]/[vn1] [v2]/[vt2]/[vn2] [v3]/[vt3]/[vn3]" << endl;
 					return -1;
 				}
 				if (sceneTarget->num_vertices() < std::max(v1,std::max(v2,v3)) || v1 == v2 || v2 == v3){
 					cerr << "Line: " << lineCount << "::Face must have three unique, previously defined vertices." << endl;
 					return -1;
 				}
-				sceneTarget->addObject(new object::Triangle(sceneTarget->vertex_at(v1), sceneTarget->vertex_at(v2), sceneTarget->vertex_at(v3)));
+				object::UVCoord uv1, uv2, uv3;
+				Vector3D norm1, norm2, norm3;
+
+				object::Triangle* newTri = new object::Triangle(sceneTarget->vertex_at(v1), sceneTarget->vertex_at(v2), sceneTarget->vertex_at(v3));
+				if (vt1 && vt2 && vt3){
+					uv1 = coord_list.at(vt1-1);
+					uv2 = coord_list.at(vt2-1);
+					uv3 = coord_list.at(vt3-1);
+					newTri->add_uv_coords(uv1, uv2, uv3);
+				}
+				if (vn1 && vn2 && vn3){
+					norm1 = normal_list.at(vn1 - 1);
+					norm2 = normal_list.at(vn2 - 1);
+					norm3 = normal_list.at(vn3 - 1);
+					newTri->add_vertex_normals(norm1, norm2, norm3);
+				}
+				sceneTarget->addObject(newTri);
 			}
+
+
 			lineCount++;
 		}
 
 		//Handle improper input
 		if (viewdir.isParallel(updir)){
-			cout << "Updir and Viewdir are coincident.\n";
+			cerr << "Updir and Viewdir are coincident.\n";
 			return -1;
 		}
 

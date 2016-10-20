@@ -10,7 +10,6 @@ Material::Material(RGBColor mtl, RGBColor spec, double a, double d, double s, do
 {
 }
 
-
 Material::~Material()
 {
 }
@@ -21,9 +20,17 @@ RGBColor Material::calcAmbient() const{
 }
 //Currently implements Phong shading
 //TODO think of a way to implement separate shading models implicitly
-RGBColor Material::calcDiffSpec(Vector3D normalDir, Vector3D lightDir, Vector3D h, RGBColor lightColor, double shadowTag) const {
+RGBColor Material::calcDiffSpec(Vector3D normalDir, Vector3D lightDir, Vector3D h, RGBColor lightColor, double shadowTag, const RGBColor* override_color) const {
+	
+	RGBColor color;
+	if (!override_color){
+		color = diffuse;
+	}
+	else{
+		color = *override_color;
+	}
 	double dot = normalDir.dot(lightDir);
-	RGBColor diff = diffuse*d*dot;
+	RGBColor diff = color*d*dot;
 	RGBColor spec = specular*s*pow(normalDir.dot(h), glossiness);
 
 	double r = shadowTag*lightColor.r * (diff.r + spec.r);

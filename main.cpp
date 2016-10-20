@@ -29,7 +29,9 @@ void Assignment0(){
 	cin >> inputFile;
 	ImageDescriptParser parser;
 
-	PPMFile ppm(parser.getFileStripped(inputFile));
+	std::string input = parser.getFileStripped(inputFile);
+
+	PPMFile ppm;
 	while (parser.parse(&ppm, inputFile)) {
 		cout << "no file exists. Enter another: ";
 		cin >> inputFile;
@@ -70,8 +72,8 @@ int main(int argc, char* argv[]){
 	}
 
 	//TODO: incorporate only 1 description of height/width in render constructor.
-	PPMFile ppm(outputFile, 255);
+	PPMFile ppm;
 
-	ppm.writeToFile(renderer.render(&mainCam, myScene, &frame));
+	ppm.writeToFile(renderer.render(&mainCam, myScene, &frame), outputFile, 255);
 	return 0;
 }

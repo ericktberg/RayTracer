@@ -4,24 +4,7 @@
 
 using namespace std;
 
-ImageFile::ImageFile(string fileName)
-{
-	destination = fileName;
-}
-
-ImageFile::ImageFile(string fileName, int maxV)
-{
-	destination = fileName;
-	maxVal = maxV;
-}
-
-
-ImageFile::ImageFile(string fileName, int w, int h, int maxV)
-{
-	destination = fileName;
-	setImageParams(w, h, maxV);
-}
-
+ImageFile::ImageFile(){}
 
 ImageFile::~ImageFile()
 {
@@ -37,9 +20,17 @@ int ImageFile::getMaxVal(){
 	return maxVal;
 }
 
-void ImageFile::setOutputFile(string newDest){
-	destination = newDest;
+void ImageFile::readFile(std::string file_name){
+	return;
 }
+
+RGBColor ImageFile::get_pixel(object::UVCoord uvs) const{
+	int i = round(uvs.u * (width - 1));
+	int j = round(uvs.v * (height - 1));
+
+	return image.at(j*width + i);
+}
+
 void ImageFile::setImageParams(int w, int h, int maxV){
 	width = w;
 	height = h;

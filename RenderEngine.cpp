@@ -6,6 +6,7 @@
 #include "RenderFrame.h"
 #include "RGBColor.h"
 #include "Scene.h"
+#include "UVCoord.h"
 
 #include <iostream>
 #include <vector>
@@ -27,8 +28,8 @@ void RenderEngine::traceRay(const Scene& scene, const Ray3D& ray, ray::RayPayloa
 	double minDistance = -1;
 	int closestObj = -1;
 	for (int k = 0; k < numObjects; k++){
-
-		const Object* currentObject = scene.object_at(k);
+		//std::cout << "object number: " << k << std::endl;
+		const object::Object* currentObject = scene.object_at(k);
 		double distance = currentObject->rayCollision(ray);
 
 		//Test for relative distance
@@ -48,25 +49,39 @@ void RenderEngine::traceRay(const Scene& scene, const Ray3D& ray, ray::RayPayloa
 
 RGBColor RenderEngine::shadeRay(const int objectID, const Scene& scene, const Point3D& intersectionPoint, const Point3D& eye){
 	int numLights = scene.get_num_lights();
-	const Object* object = scene.object_at(objectID);
+	const object::Object* object = scene.object_at(objectID);
 	const Material* objectMaterial = scene.material_of(objectID);
+	const PPMFile* texture;
+	int texture_index = scene.texture_index_of(objectID);
 
 	Vector3D viewDir(eye, intersectionPoint);
+	viewDir.normalize();
 	Vector3D surfaceNormal = object->getNormal(intersectionPoint);
 	
 	RGBColor result = objectMaterial->calcAmbient();
 	for (int i = 0; i < numLights; i++){
+		RGBColor* override_color;
+
+		if (texture_index >= 0){
+			texture = scene.texture_at(texture_index);
+			object::UVCoord uvs = object->get_uv(intersectionPoint);
+			override_color = &texture->get_pixel(uvs);
+		}
+		else{
+			override_color = nullptr;
+		}
+
 		using light::Light;
 		const Light* light = scene.light_at(i);
 
 		//TODO? Currently has random behavior when object intersects area light
 		double shadow = sendShadowPacket(scene, light, intersectionPoint);
-		
-		
+
 		RGBColor diffSpec = { 0, 0, 0 };
 		Vector3D lightDir(light->get_center(), intersectionPoint);
+		lightDir.normalize();
 		Vector3D h = viewDir + lightDir;
-		diffSpec = diffSpec + objectMaterial->calcDiffSpec(surfaceNormal, lightDir, h, light->get_color(), shadow);
+		diffSpec = diffSpec + objectMaterial->calcDiffSpec(surfaceNormal, lightDir, h, light->get_color(), shadow, override_color);
 		//Add specular and diffuse onto ambient and other lights
 		result = result + diffSpec;
 		result.clamp();
@@ -85,6 +100,7 @@ double RenderEngine::sendShadowPacket(const Scene& scene, const light::Light* li
 	ray::RayPayload* payload = new ray::RayPayload();
 	for (int i = 0; i < shadow_samples; i++){
 		Vector3D lightDir(light->get_sample(i), startingPoint);
+		lightDir.normalize();
 		if (light->is_directional()){
 			lightDir = light->get_direction();
 		}
@@ -140,10 +156,10 @@ RenderFrame* RenderEngine::render(Camera* renderCamera, const Scene& renderScene
 			
 			// Calculate ray from pixel -> eye
 			Vector3D rayVec(pixel, eye);
+			rayVec.normalize();
 			Ray3D ray = { rayVec, eye };	
 			traceRay(renderScene, ray, payload);
 			int nearestObj = payload->get_object_id();
-			//std::cout << "payload: " << nearestObj << std::endl;
 			// save nearest color
 			if (nearestObj >= 0){
 				renderImage[i*pxImageWidth + j] = shadeRay(nearestObj, renderScene, eye + rayVec.getPointAt(payload->get_load_distance()), eye);

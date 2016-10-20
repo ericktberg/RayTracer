@@ -7,13 +7,14 @@
 #pragma once
 #include <string>
 #include "RGBColor.h"
+#include "UVCoord.h"
+
+#include <vector>
 
 class ImageFile
 {
 	public:
-		ImageFile(std::string destination);
-		ImageFile(std::string destination, int maxVal);
-		ImageFile(std::string destination, int width, int height, int maxVal);
+		ImageFile();
 		virtual ~ImageFile();
 
 		int getWidth();
@@ -22,11 +23,12 @@ class ImageFile
 		void setOutputFile(std::string newDest);
 		void setImageParams(int width, int height, int maxVal);
 
-	protected:
-		// saveFile destination
-		std::string destination;
+		virtual void readFile(std::string input);
+		virtual RGBColor get_pixel(object::UVCoord uvs) const;
 
-		// Image save parameters
+	protected:
+		// Image parameters
+		std::vector<RGBColor> image;
 		int width;
 		int height;
 		int maxVal;

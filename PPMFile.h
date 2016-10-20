@@ -14,8 +14,7 @@
 class PPMFile : public ImageFile
 {
 	public:
-		PPMFile(std::string destination);
-		PPMFile(std::string destination, int maxVal);
+		PPMFile();
 
 		~PPMFile();
 
@@ -24,14 +23,13 @@ class PPMFile : public ImageFile
 
 		// Writes a width*height dimension array to the destination file
 
-		//TODO: gets width and height from params.
-		void writeToFile(RenderFrame* frame);
-
+		void writeToFile(RenderFrame* frame, std::string destination, int max_val);
+		void readFile(std::string file_name);
 	private:
 		std::string type;
 
 		// Helper functions for writeToFile
-		std::string ppmHeader(int width, int height);
+		std::string ppmHeader(int width, int height, int max_val);
 		std::string convertImage(RGBColor* image, int width, int height);
 };
 

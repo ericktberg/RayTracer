@@ -1,11 +1,12 @@
 #pragma once
+#include "PPMFile.h"
 #include "RGBColor.h"
 #include "Vector3D.h"
 
 class Material
 {
 public:
-	Material(RGBColor,RGBColor,double a, double d, double s,double);
+	Material(RGBColor,RGBColor,double a, double d, double s,double n);
 	~Material();
 
 	RGBColor get_diffuse(){ return diffuse; };
@@ -14,7 +15,7 @@ public:
 	double get_glossiness(){ return glossiness; };
 
 	virtual RGBColor calcAmbient() const;
-	virtual RGBColor calcDiffSpec(Vector3D normalDir, Vector3D lightDir, Vector3D h, RGBColor lightColor, double shadow) const;
+	virtual RGBColor calcDiffSpec(Vector3D normalDir, Vector3D lightDir, Vector3D h, RGBColor lightColor, double shadow, const RGBColor* override_color) const;
 
 private:
 	RGBColor diffuse; //Od[r,g,b]

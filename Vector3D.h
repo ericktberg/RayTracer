@@ -26,19 +26,19 @@ class Vector3D {
 		Vector3D(Point3D point2, Point3D point1);
 
 		//Create a new vector orthogonal to this and given vector
-		Vector3D crossProduct(Vector3D vector2);
+		Vector3D crossProduct(Vector3D vector2) const;
 
 		// Perform inner product on this and given vector
-		double dot(Vector3D vector2);
+		double dot(Vector3D vector2) const;
 
-		int isParallel(Vector3D vector2);
+		int isParallel(Vector3D vector2) const;
 		int isOrthogonal(Vector3D vector2);
 
 		// Convert vector to unit length
 		void normalize();
 	
 		// Calculate a point at the given distance along this vector
-		Point3D getPointAt(double distance);
+		Point3D getPointAt(double distance) const;
 
 		double x() const { return x_; };
 		double y() const { return y_; };
